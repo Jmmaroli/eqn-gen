@@ -1,6 +1,11 @@
 # eqn-gen
 A framework for generating discrete dynamical system equations from input-output data. A neural network model of the data is first created and then a form of sensitivity analysis is performed on the model to reimagine it as a sum of functions of its arguments. These component functions present a less complex identification problem and are estimated using curve fitting. The sum of component functions is the resultant system equation estimate. This process is integrated into an iterative framework to add robustness to the estimate.
 
+System equations are generated as an input-output model
+```
+y[k] = f(y[k-1],...,y[k-n],u[k],...,u[k-n])
+```
+
 ## Prerequisites
 * [PyTorch](https://github.com/pytorch/pytorch) is required for learning input-output data and must be installed.
 * The [TCN](https://github.com/locuslab/TCN) model is a neural network variant used by the framework, however it is included within the code.
@@ -25,7 +30,8 @@ output_data = |y1[k-N] y2[k-N] y3[k-N]   ...  |
 ```
 where N is the number of samples. The data is simply arranged so that the last row is the most recent data and the first row is the initial data.
 
-System equations are generated as an input-output model
+A script called run_example.py is provided with 10 examples. Examples are run using
 ```
-y[k] = f(y[k-1],...,y[k-n],u[k],...,u[k-n])
+python run_example.py #
 ```
+where # indicates the example (indexed 0-9). This script contains everything needed to use the framework and is a simple starting point for analyzing data of your own.
