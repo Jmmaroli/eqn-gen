@@ -10,11 +10,11 @@ A framework for generating discrete dynamical system equations from input-output
 
 ## Usage
 The framework is implemented as a single function
-...
+```
 estimate_equation(model_parameters, analysis_parameters, input_data, output_data)
-...
+```
 This function takes a number of settings defined in the model_parameters and analysis_parameters dictionaries. The input and output data are simply 2D numpy arrays in the form
-...
+```
 input_data  = |u1[k-N] u2[k-N] u3[k-N]   ...  |
               |  ...     ...     ...     ...  |
               | u1[k]   u2[k]   u3[k]    ...  |
@@ -22,10 +22,10 @@ input_data  = |u1[k-N] u2[k-N] u3[k-N]   ...  |
 output_data = |y1[k-N] y2[k-N] y3[k-N]   ...  |
               |  ...     ...     ...     ...  |
               | y1[k]   y2[k]   y3[k]    ...  |
-...
+```
 where N is the number of samples. The data is simply arranged so that the last row is the most recent data and the first row is the initial data.
 
 System equations are generated as an input-output model
-...
+```
 y[k] = f(y[k-1],...,y[k-n],u[k],...,u[k-n])
-...
+```
