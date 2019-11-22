@@ -149,7 +149,6 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
     time.sleep(0.5) # Allows progress bar to finish printing elapsed time.
     print()
 
-    # TODO: Format for variable input channels.
     def process_subcombination(subcombination):
         sub_impulse = np.zeros([input_channels*history])
         # Determine index of combination in impulse_response
@@ -169,7 +168,7 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                     subsub_indices.append(subsub_index)
         return sub_index, subsub_indices
     
-    # TODO: Analysis progress bar is not linear with time.
+    # Analyze responses (note: progress bar is not linear with computation time)
     print("Analyzing responses...")
     progress_bar = pyprind.ProgBar(combination_count, monitor=True)
     num_cores = multiprocessing.cpu_count()
@@ -239,7 +238,7 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
             sig_impulse = impulse_array[sig_index:sig_index+1, :, :]
             if verbose: print("Response ID " + str(sig_index) + " contribution:")
             
-            # Process a product function if it’s response is significant.
+            # Process a product function if the response is significant.
             # Significance is % contribution to total magnitude or variance.
             # Bias is not included in magnitude significance.
             z_sorted = np.flip(np.sort(Z[1:], 0), 0)
@@ -481,10 +480,10 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                     if candidate_metrics[0]["MAE"] > current_metrics[0]["MAE"]:
                         if verbose:
                             print("Warning: Candidate product function worsens overall MAE.")
-                            print("         MAE declines from " + str(FORMAT%current_metrics[0]["MAE"])+\
+                            print("         MAE increases from " + str(FORMAT%current_metrics[0]["MAE"])+\
                                   " to " + str(FORMAT%candidate_metrics[0]["MAE"]) + ".")
                         if contribution_magnitude < contrib_thresh_omit \
-                        or contribution_variance < contrib_thresh_omit:
+                        and contribution_variance < contrib_thresh_omit:
                             if verbose: print("         Candidate product function omitted.")
                         else:
                             channel_function.append(product_function)
