@@ -72,7 +72,7 @@ def estimate_equation(model_parameters, analysis_parameters, input_data, output_
     for c in range(0, len(metrics_v3)):
         mae_percent_range.append(metrics_v3[c]["MAE"]/(metrics_v3[c]["MAX"]-metrics_v3[c]["MIN"]))
     # Threshold value for deeper analysis as MAE percent of total range.
-    if any(value > 0.05 for value in mae_percent_range):
+    if any(value > 0.10 for value in mae_percent_range):
         hf_loop_limit = 5
         hf_loop_count = 1
         while hf_loop_count <= hf_loop_limit:
@@ -144,7 +144,7 @@ def estimate_equation(model_parameters, analysis_parameters, input_data, output_
             mae_percent_range = []
             for c in range(0, len(metrics_v3)):
                 mae_percent_range.append(metrics_v3[c]["MAE"]/(metrics_v3[c]["MAX"]-metrics_v3[c]["MIN"]))
-            if all(value < 0.05 for value in mae_percent_range):
+            if all(value < 0.10 for value in mae_percent_range):
                 print("Higher fidelity analysis was successful")
                 break
         
