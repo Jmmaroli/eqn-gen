@@ -25,8 +25,8 @@ if __name__ == "__main__":
         "cuda": True,               # use the GPU
         "dropout": 0.0,             # dropout applied to layers
         "clip": -1,                 # -1 means no clip
-        "ksize": 2,                 # kernel size
-        "levels": 1,                # number of levels
+        "ksize": 3,                 # kernel size
+        "levels": 2,                # number of levels
         "nhid": 64,                 # number of hidden units per layer
         "batch_size_train": 32,     # batch size for training
         "train_loss_full": 0,       # [1] full loss, [0] avg over batches
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         "history": 8,               # number of time sample inputs to the network
         "test_data": 0.2,           # test data proportion
         "seed": 1111,               # random seed
-        "visual": False,             # plot training metrics
+        "visual": False,            # plot training metrics
         "save_visual": True,        # save training metric plot
     }
     
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         "use_f_weight": True,               # Use product function weighting
         "seed": 1111,                       # Analysis rng seed for reproducability
         "verbose": True,                    # Print details of analysis
-        "visual": False,                     # Plot available 2D and 3D product function samples
+        "visual": False,                    # Plot available 2D and 3D product function samples
         "save_visual": True,                # Save plots of available 2D and 3D product function samples
         "GA_population": 250,               # Population size for GA tuning
         "GA_generations": 100               # Number of generations in GA tuning
@@ -270,9 +270,35 @@ if __name__ == "__main__":
             u_k1 = input_data[i-1, 0]
             
             output_data[i, 0] = pow(u_k0,2)
-        
+            
     elif EXAMPLE == 8:
+        # Higher dimensional product functions.
+        # y[k] = u[k]*u[k-2]*u[k-4]*u[k-6]*u[k-8]
+        print("Higher Dimensional Product functions\n")
+        input_data = 2*(np.random.rand(25000, 1)-0.5)
+        output_data = np.zeros([25000, 1])
+        
+        model_parameters["epochs"] = 100
+        model_parameters["ksize"] = 3
+        model_parameters["levels"] = 2
+        model_parameters["history"] = 10
+        model_parameters["cuda"] = False
+        
+        analysis_parameters["sweep_initial"] = 250
+        analysis_parameters["sweep_detailed"] = 5000
+        
+        for i in range(2, 25000):
+            u_k0 = input_data[i, 0]
+            u_k2 = input_data[i-2, 0]
+            u_k4 = input_data[i-4, 0]
+            u_k6 = input_data[i-6, 0]
+            u_k8 = input_data[i-8, 0]
+
+            output_data[i, 0] = 1.0*u_k0*u_k2*u_k4*u_k6*u_k8
+        
+    elif EXAMPLE == 9:
         # Silver box example.
+        print("Silverbox Example\n")
         model_parameters["epochs"] = 1000
         model_parameters["ksize"] = 3
         model_parameters["levels"] = 2
@@ -313,8 +339,9 @@ if __name__ == "__main__":
             input_data = input_data[1:]
             output_data = output_data[1:]
             
-    elif EXAMPLE == 9:
+    elif EXAMPLE == 10:
         # Roll dynamics example.
+        print("Roll Dynamics Example\n")
         model_parameters["epochs"] = 150
         model_parameters["ksize"] = 2
         model_parameters["levels"] = 2
@@ -354,6 +381,47 @@ if __name__ == "__main__":
             input_data = input_data[1:]
             output_data = output_data[1:]
             
+    elif EXAMPLE == 11:
+        # Electric vehicle motor cooling example.
+        # Note: high fidelity analysis is often triggered but not necessary in this example.
+        #       Change the default high fidelity analysis threshold in estimate_equation.py to prevent this.
+        print("Motor Cooling Example\n")
+        model_parameters["epochs"] = 100
+        model_parameters["ksize"] = 3
+        model_parameters["levels"] = 2
+        model_parameters["history"] = 7
+        model_parameters["nhid"] = 48
+        model_parameters["cuda"] = False
+        model_parameters["test_data"] = 0.10
+        model_parameters["dropout"] = 0.05
+        
+        analysis_parameters["sweep_initial"] = 100
+        analysis_parameters["contrib_thresh"] = 0.01
+        analysis_parameters["contrib_thresh_omit"] = 0.05
+        analysis_parameters["use_f_weight"] = True
+        
+        temp_in_array = []
+        temp_out_array = []
+        temp_motor_array = []
+        with open('data/cooling/cooling_data.txt') as fp:
+            for cnt, line in enumerate(fp):
+                if cnt > 0:
+                    split_line = line.split('\t')
+                    temp_in = float(split_line[1])
+                    temp_out = float(split_line[2])
+                    temp_motor = float(split_line[3])
+                    
+                    temp_in_array.append(temp_in)
+                    temp_out_array.append(temp_out)
+                    temp_motor_array.append(temp_motor)
+                
+            input_data = np.zeros([len(temp_motor_array), 2])
+            output_data = np.zeros([len(temp_motor_array), 1])
+            for i in range(0, len(temp_motor_array)):
+                input_data[i,0] = temp_in_array[i]
+                input_data[i,1] = temp_out_array[i]
+                output_data[i,0] = temp_motor_array[i]
+
     else:
         print("Invalid example selection. Exiting.")
         sys.exit()

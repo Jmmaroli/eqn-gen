@@ -288,15 +288,56 @@ def fcn_linear_3(x,a):
     return a*x[0]*x[1]*x[2]
 def txt_linear_3(argList,argShift,a):
     if all(shift == 0 for shift in argShift):
-        return "{:.2e}*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]".format(
+        return "{:.3e}*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]".format(
                 a,argList[0]["input_channel"]+1,argList[0]["delay"],
                 argList[1]["input_channel"]+1,argList[1]["delay"],
                 argList[2]["input_channel"]+1,argList[2]["delay"])
     else:
-        return "{:.2e}*(x{:d}[k-{:d}]-{:.2e})*(x{:d}[k-{:d}]-{:.2e})*(x{:d}[k-{:d}]-{:.2e})".format(
+        return "{:.3e}*(x{:d}[k-{:d}]-{:.2e})*(x{:d}[k-{:d}]-{:.2e})*(x{:d}[k-{:d}]-{:.2e})".format(
                 a,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],
                 argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1],
                 argList[2]["input_channel"]+1,argList[2]["delay"],argShift[2])
+        
+def fcn_linear_4(x,a):
+    return a*x[0]*x[1]*x[2]*x[3]
+def txt_linear_4(argList,argShift,a):
+    if all(shift == 0 for shift in argShift):
+        return "{:.3e}*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]".format(
+                a,argList[0]["input_channel"]+1,argList[0]["delay"],
+                argList[1]["input_channel"]+1,argList[1]["delay"],
+                argList[2]["input_channel"]+1,argList[2]["delay"],
+                argList[3]["input_channel"]+1,argList[3]["delay"])
+    else:
+        return "{:.3e}*(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})".format(
+                a,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],
+                argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1],
+                argList[2]["input_channel"]+1,argList[2]["delay"],argShift[2],
+                argList[3]["input_channel"]+1,argList[3]["delay"],argShift[3])
+        
+def fcn_linear_5(x,a):
+    return a*x[0]*x[1]*x[2]*x[3]*x[4]
+def txt_linear_5(argList,argShift,a):
+    if all(shift == 0 for shift in argShift):
+        return "{:.3e}*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]*x{:d}[k-{:d}]".format(
+                a,argList[0]["input_channel"]+1,argList[0]["delay"],
+                argList[1]["input_channel"]+1,argList[1]["delay"],
+                argList[2]["input_channel"]+1,argList[2]["delay"],
+                argList[3]["input_channel"]+1,argList[3]["delay"],
+                argList[4]["input_channel"]+1,argList[4]["delay"])
+    else:
+        return "{:.3e}*(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})*" \
+               "(x{:d}[k-{:d}]-{:.2e})".format(
+                a,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],
+                argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1],
+                argList[2]["input_channel"]+1,argList[2]["delay"],argShift[2],
+                argList[3]["input_channel"]+1,argList[3]["delay"],argShift[3],
+                argList[4]["input_channel"]+1,argList[4]["delay"],argShift[4])
 #=============================================================================#
     
 # Exponentials.
@@ -585,12 +626,30 @@ def fitting_functions():
     #=========================================================================#
     
     #=========================================================================#
-    # Functions of 3 variables.
+    # Functions of 3+ variables.
     #=========================================================================#
     dct_linear_3 = {
         "txt": "a*x1*x2*x3",
         "txt_fcn": txt_linear_3,
         "fcn": fcn_linear_3,
+        "upper": [10],
+        "lower": [-10],
+        "weight": 1.0
+    }
+
+    dct_linear_4 = {
+        "txt": "a*x1*x2*x3*x4",
+        "txt_fcn": txt_linear_4,
+        "fcn": fcn_linear_4,
+        "upper": [10],
+        "lower": [-10],
+        "weight": 1.0
+    }
+
+    dct_linear_5 = {
+        "txt": "a*x1*x2*x3*x4*x5",
+        "txt_fcn": txt_linear_5,
+        "fcn": fcn_linear_5,
         "upper": [10],
         "lower": [-10],
         "weight": 1.0
@@ -621,11 +680,17 @@ def fitting_functions():
                     ]
     
     input_3_list = [dct_linear_3]
+    
+    input_4_list = [dct_linear_4]
+    
+    input_5_list = [dct_linear_5]
 
     functionDictionary = {
         1: input_1_list,
         2: input_2_list,
-        3: input_3_list        
+        3: input_3_list,
+        4: input_4_list,
+        5: input_5_list
     }
     
     return functionDictionary
