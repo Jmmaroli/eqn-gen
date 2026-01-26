@@ -244,7 +244,7 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
             z_sorted = np.flip(np.sort(Z[1:], 0), 0)
             contribution_magnitude = sig_response/sum(z_sorted)
             contribution_variance = sig_variance/total_variance
-            if sig_index is not 0:
+            if sig_index != 0:
                 if verbose: print("Magnitude : " + str('%.1f'%(contribution_magnitude*100)) + "%")
                 if verbose: print("Variance  : " + str('%.1f'%(contribution_variance*100)) + "%")
             else:
