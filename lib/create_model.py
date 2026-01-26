@@ -68,7 +68,15 @@ def create_model(model_parameters, inputData, outputData, inputMask=1):
     save_visual = model_parameters["save_visual"]             # save training metric plot
 
     torch.manual_seed(seed)
-        
+    
+    # Set additional seeds for reproducibility
+    if cuda:
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        # Make CUDA operations deterministic
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    
     # Get the current data output folder if saving data and plots.
     if save_visual:
         if not os.path.exists('./output'):
