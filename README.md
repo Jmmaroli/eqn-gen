@@ -6,12 +6,48 @@ System equations are generated as an input-output model
 y[k] = f(y[k-1],...,y[k-n],u[k],...,u[k-n])
 ```
 
+## Installation
+
+### Setting up a Virtual Environment
+
+1. Create a virtual environment:
+```bash
+python -m venv venv
+```
+
+2. Activate the virtual environment:
+   - On Linux/Mac:
+   ```bash
+   source venv/bin/activate
+   ```
+   - On Windows:
+   ```bash
+   venv\Scripts\activate
+   ```
+
+3. Install the package and all dependencies:
+```bash
+pip install -e .
+```
+
+Optional - install CUDA support for GPU
+```bash
+pip uninstall -y torch
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+```
+
+This will install all required dependencies including:
+* [PyTorch](https://github.com/pytorch/pytorch) - for learning input-output data
+* [SciPy](https://www.scipy.org/) - for curve fitting
+* [NumPy](https://numpy.org/) - for numerical computations
+* [matplotlib](https://matplotlib.org/) - for plotting
+* [PyPrind](https://github.com/rasbt/pyprind) - for progress indicators
+* [mat4py](https://pypi.org/project/mat4py/) - for MATLAB data export
+* [joblib](https://joblib.readthedocs.io/) - for parallel processing
+* [psutil](https://github.com/giampaolo/psutil) - for system monitoring
+
 ## Prerequisites
-* [PyTorch](https://github.com/pytorch/pytorch) is required for learning input-output data and must be installed.
 * The [TCN](https://github.com/locuslab/TCN) model is a neural network variant used by the framework, however it is included within the code.
-* Sometimes the analysis takes a very long time, so [Pyprind](https://github.com/rasbt/pyprind) is used to indicate progress.
-* Data is exported in .mat format using [mat4py](https://pypi.org/project/mat4py/), however this can be removed if not needed.
-* Curve fitting is performed using [SciPy](https://www.scipy.org/).
 
 ## Usage
 The framework is implemented as a single function

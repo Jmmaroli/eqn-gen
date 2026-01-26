@@ -1,0 +1,24 @@
+[project]
+name = "eqn-gen"
+version = "1.1.0"
+description = "A framework for generating discrete dynamical system equations from input-output data"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {file = "LICENSE"}
+dependencies = [
+    "joblib>=1.3.0,<2.0.0",
+    "mat4py>=0.6.0,<1.0.0",
+    "matplotlib>=3.9.0,<4.0.0",
+    "numpy>=2.1.0,<3.0.0",
+    "psutil>=7.0.0,<8.0.0",
+    "PyPrind>=2.11.3,<3.0.0",
+    "scipy>=1.13.1,<2.0.0",
+    "torch>=2.6.0,<3.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["lib"]
