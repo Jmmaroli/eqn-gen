@@ -97,6 +97,8 @@ def tune_model(tuning_parameters, model_function, input_data, output_data):
                     mutation_degree = 0.1*2*(np.random.rand(parameter_count)-0.5)
                     mutation = mutation_mask*mutation_degree
                     population[member_id, :] = population[member_id, :] + mutation
+                    # Enforce parameter bounds.
+                    population[member_id, :] = np.clip(population[member_id, :], lower_bounds, upper_bounds)
             progress_bar.update()
         time.sleep(0.5) # Allows progress bar to finish printing elapsed time.
 
