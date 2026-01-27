@@ -1,4 +1,4 @@
-\# Framework library
+# Framework library
 
 The framework is implemented as a single function:
 ```
