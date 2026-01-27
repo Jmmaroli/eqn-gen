@@ -2,7 +2,7 @@
 
 import numpy as np
 
-# Polynomials.
+# Polynomial functions of 1 variable.
 #=============================================================================#
 def fcn_poly1_1(x,a):
     return a*x[0]
@@ -124,6 +124,8 @@ def txt_poly5_1(argList,argShift,a,b,c,d,e):
                 d,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],
                 e,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0])
                 
+# Polynomial functions of 2 variables.
+#=============================================================================#
 def fcn_poly22_2(x,a):
     return a*x[0]*x[1]
 def txt_poly22_2(argList,argShift,a):
@@ -284,6 +286,8 @@ def txt_poly55_2(argList,argShift,a,b,c,d,e,f,g,h,i,j):
                 j,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],
                 argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1])
                 
+# Multilinear functions.
+#=============================================================================#
 def fcn_linear_3(x,a):
     return a*x[0]*x[1]*x[2]
 def txt_linear_3(argList,argShift,a):
@@ -338,7 +342,6 @@ def txt_linear_5(argList,argShift,a):
                 argList[2]["input_channel"]+1,argList[2]["delay"],argShift[2],
                 argList[3]["input_channel"]+1,argList[3]["delay"],argShift[3],
                 argList[4]["input_channel"]+1,argList[4]["delay"],argShift[4])
-#=============================================================================#
     
 # Exponentials.
 #=============================================================================#
@@ -375,9 +378,8 @@ def txt_exp_lin21_2(argList,argShift,a):
         return "{:.2e}*(x{:d}[k-{:d}]-{:.2e})*(e^(x{:d}[k-{:d}]-{:.2e})-1)".format(
                 a,argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1],
                 argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0])
-#=============================================================================#
 
-# Sinusoidal functions.
+# Trigonometric and hyperbolic functions.
 #=============================================================================#
 # This function is hard to fit, so forms with less parameters are included.
 def fcn_sin_1(x,a,b,c):
