@@ -452,8 +452,8 @@ def txt_tanh21_2(argList,argShift,a,b,c,d,e):
         return "{:.2e}*tanh({:.2e}*(x{:d}[k-{:d}]-{:.2e})-{:.2e})*" \
                 "tanh({:.2e}*(x{:d}[k-{:d}]-{:.2e})-{:.2e}) - " \
                 "{:.2e}".format(
-                        a,b,argList[1]["input_channel"]+1,argList[1]["delay"],argShift[0],c,
-                        d,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[1],e,
+                        a,b,argList[1]["input_channel"]+1,argList[1]["delay"],argShift[1],c,
+                        d,argList[0]["input_channel"]+1,argList[0]["delay"],argShift[0],e,
                         (a*np.tanh(-c)*np.tanh(-e)))
 #=============================================================================#
 
