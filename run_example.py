@@ -38,28 +38,28 @@ if __name__ == "__main__":
         "test_data": 0.2,           # test data proportion
         "seed": 1111,               # random seed
         "visual": False,            # plot training metrics
-        "save_visual": True,        # save training metric plot
+        "save_visual": True,        # save training metrics plot
     }
     
     analysis_parameters = {
-        "functions": fitting_functions(),   # An object containing template product functions
-        "sweep_initial": 25,                # Elements in initial sweep set for significance detection
-        "sweep_detailed": 1000,             # Elements in detailed sweep set for curve fitting
-        "contrib_thresh": 0.05,             # Minimum product function significance for inclusion [0.00-1.00]
-        "contrib_thresh_omit": 0.10,        # Threshold for conditional product function inclusion
-        "use_f_weight": True,               # Use product function weighting
-        "seed": 1111,                       # Analysis rng seed for reproducability
-        "verbose": True,                    # Print details of analysis
-        "visual": False,                    # Plot available 2D and 3D product function samples
-        "save_visual": True                # Save plots of available 2D and 3D product function samples
+        "functions": fitting_functions(),   # an object containing template product functions
+        "sweep_initial": 25,                # elements in initial sweep set for significance detection
+        "sweep_detailed": 1000,             # elements in detailed sweep set for curve fitting
+        "contrib_thresh": 0.05,             # minimum product function significance for inclusion [0.00-1.00]
+        "contrib_thresh_omit": 0.10,        # threshold for conditional product function inclusion
+        "use_f_weight": True,               # use product function weighting
+        "seed": 1111,                       # analysis rng seed for reproducability
+        "verbose": True,                    # print details of analysis
+        "visual": False,                    # plot available 2D and 3D product function samples
+        "save_visual": True                 # save plots of available 2D and 3D product function samples
     }
     
     tuning_parameters = {
-        "ga_population": 250,
-        "ga_generations": 100,
-        "visual": False,
-        "save_visual": True,
-        "seed": 1111
+        "ga_population": 250,               # population of a GA generation
+        "ga_generations": 100,              # generations to run GA
+        "visual": False,                    # plot GA training metrics
+        "save_visual": True,                # save plot of GA training metrics
+        "seed": 1111                        # GA rng seed for reproducability
     }
     
     # Random number generator seed for reproducability.
