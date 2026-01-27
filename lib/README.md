@@ -22,4 +22,4 @@ model_function, output_mask = analyze_model(analysis_parameters, model_dictionar
 model_function_tuned = tune_model(tuning_parameters, model_function, input_data, output_data)
 ```
 
-The framework utilizes the `output_mask` of the first call to `analyze_model()` to create an a more focused model, which is analyzed again and compared to the initial model before `tune_model()` is called. See `estimate_equation.py` for details.
+The framework utilizes the `output_mask` of the first call to `analyze_model()` to create a a more focused model, which is analyzed again and compared to the initial model before `tune_model()` is called. See `estimate_equation.py` for details.
