@@ -6,6 +6,29 @@ System equations are generated as an input-output model
 y[k] = f(y[k-1],...,y[k-n],u[k],...,u[k-n])
 ```
 
+## Usage
+The framework is implemented as a single function
+```
+estimate_equation(model_parameters, analysis_parameters, tuning_parameters, input_data, output_data)
+```
+This function takes a number of settings defined in the model_parameters, analysis_parameters, and tuning_parameters dictionaries. The input and output data are simply 2D numpy arrays in the form
+```
+input_data  = |u1[k-N] u2[k-N] u3[k-N]   ...  |
+              |  ...     ...     ...     ...  |
+              | u1[k]   u2[k]   u3[k]    ...  |
+
+output_data = |y1[k-N] y2[k-N] y3[k-N]   ...  |
+              |  ...     ...     ...     ...  |
+              | y1[k]   y2[k]   y3[k]    ...  |
+```
+where N is the number of samples. The data is simply arranged so that the last row is the most recent data and the first row is the initial data.
+
+A script called run_example.py is provided with 10 examples. Examples are run using
+```
+python run_example.py #
+```
+where # indicates the example (indexed 0-9). This script contains everything needed to use the framework and is a simple starting point for analyzing data of your own.
+
 ## Installation
 
 ### Setting up a Virtual Environment
@@ -48,26 +71,3 @@ This will install all required dependencies including:
 
 ## Prerequisites
 * The [TCN](https://github.com/locuslab/TCN) model is a neural network variant used by the framework, however it is included within the code.
-
-## Usage
-The framework is implemented as a single function
-```
-estimate_equation(model_parameters, analysis_parameters, input_data, output_data)
-```
-This function takes a number of settings defined in the model_parameters and analysis_parameters dictionaries. The input and output data are simply 2D numpy arrays in the form
-```
-input_data  = |u1[k-N] u2[k-N] u3[k-N]   ...  |
-              |  ...     ...     ...     ...  |
-              | u1[k]   u2[k]   u3[k]    ...  |
-
-output_data = |y1[k-N] y2[k-N] y3[k-N]   ...  |
-              |  ...     ...     ...     ...  |
-              | y1[k]   y2[k]   y3[k]    ...  |
-```
-where N is the number of samples. The data is simply arranged so that the last row is the most recent data and the first row is the initial data.
-
-A script called run_example.py is provided with 10 examples. Examples are run using
-```
-python run_example.py #
-```
-where # indicates the example (indexed 0-9). This script contains everything needed to use the framework and is a simple starting point for analyzing data of your own.
