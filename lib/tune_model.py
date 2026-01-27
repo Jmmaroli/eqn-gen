@@ -12,8 +12,8 @@ from lib.evaluate_function import evaluate_function
 
 def tune_model(tuning_parameters, model_function, input_data, output_data):
     
-    population_size = tuning_parameters["GA_population"]
-    generation_count = tuning_parameters["GA_generations"]
+    population_size = tuning_parameters["ga_population"]
+    generation_count = tuning_parameters["ga_generations"]
     visual = tuning_parameters["visual"]
     save_visual = tuning_parameters["save_visual"]
     seed = tuning_parameters["seed"]

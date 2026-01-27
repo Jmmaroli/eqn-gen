@@ -51,9 +51,15 @@ if __name__ == "__main__":
         "seed": 1111,                       # Analysis rng seed for reproducability
         "verbose": True,                    # Print details of analysis
         "visual": False,                    # Plot available 2D and 3D product function samples
-        "save_visual": True,                # Save plots of available 2D and 3D product function samples
-        "GA_population": 250,               # Population size for GA tuning
-        "GA_generations": 100               # Number of generations in GA tuning
+        "save_visual": True                # Save plots of available 2D and 3D product function samples
+    }
+    
+    tuning_parameters = {
+        "ga_population": 250,
+        "ga_generations": 100,
+        "visual": False,
+        "save_visual": True,
+        "seed": 1111
     }
     
     # Random number generator seed for reproducability.
@@ -436,4 +442,4 @@ if __name__ == "__main__":
                       sort_keys=True) + "\n")
 
     # Estimate the equation using input-output data.
-    estimate_equation(model_parameters, analysis_parameters, input_data, output_data)
+    estimate_equation(model_parameters, analysis_parameters, tuning_parameters, input_data, output_data)

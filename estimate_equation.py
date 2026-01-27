@@ -10,7 +10,7 @@ from lib.tune_model import tune_model
 
 FORMAT = '%.3e'
 
-def estimate_equation(model_parameters, analysis_parameters, input_data, output_data):
+def estimate_equation(model_parameters, analysis_parameters, tuning_parameters, input_data, output_data):
 
     sweep_initial = analysis_parameters["sweep_initial"]
     sweep_detailed = analysis_parameters["sweep_detailed"]
@@ -158,11 +158,6 @@ def estimate_equation(model_parameters, analysis_parameters, input_data, output_
     
     print("Genetic algorithm tuning")
     print("============================================================")
-    tuning_parameters = {"GA_population": analysis_parameters["GA_population"],
-                         "GA_generations": analysis_parameters["GA_generations"],
-                         "visual": analysis_parameters["visual"],
-                         "save_visual": analysis_parameters["save_visual"],
-                         "seed": analysis_parameters["seed"]}
     model_function_v4 = tune_model(tuning_parameters, model_function_v3, input_data, output_data)
     metrics_v4 = evaluate_function(model_function_v4, input_data, output_data)
     
