@@ -13,7 +13,7 @@ import pyprind # Progress bar
 import torch
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import mat4py
+import h5py
 import os
 
 from lib.evaluate_function import evaluate_function
@@ -295,7 +295,8 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                     "function": dct_empty,
                     "shift": []
                 }
-                if len(arg_list) > 0:
+                arg_count = len(arg_list)
+                if arg_count > 0:
                     # Obtain sample points for curve fitting.
                     x_data = np.zeros([sweep_detailed, input_channels, history])
                     y_data = np.zeros([sweep_detailed, output_channels])
@@ -322,7 +323,6 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                         y_data = y_data - contribution
                     
                     # Format data for curve fitting
-                    arg_count = len(arg_list)
                     x_data_fit = np.zeros([arg_count, sweep_detailed])
                     y_data_fit = np.zeros([sweep_detailed])
                     arg = 0
@@ -410,6 +410,65 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                                 print("Warning: Fit could not be estimated for " + f["txt"] + ",")
                                 print("         " + str(e))
                                 print("")
+                                
+                    # Plot 2D and 3D data with fitted function for visual inspection.
+                    if (save_visual or visual) and (arg_count == 1 or arg_count == 2):
+                        visual_dir = './output/analysis_{}/y{}_visuals'.format(analysis_dir_count, channel_id+1)
+                        os.makedirs(visual_dir, exist_ok=True)
+                        
+                        if arg_count == 1:
+                            plt.figure()
+                            # Plot response data
+                            plt.scatter(x_data_fit[0], y_data_fit, marker='.', label='Response data')
+                            # Plot the fitted function
+                            x_sorted_indices = np.argsort(x_data_fit[0])
+                            x_sorted = x_data_fit[0][x_sorted_indices]
+                            y_sorted = y_data_fit[x_sorted_indices]
+                            y_fit_2d = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
+                            y_fit_sorted = y_fit_2d[x_sorted_indices]
+                            plt.plot(x_sorted, y_fit_sorted, 'r-', linewidth=2, label='Fitted function')
+                            
+                            plt.title(product_function["template_string"])
+                            plt.xlabel(f_list[0])
+                            plt.legend()
+                            
+                        if arg_count == 2:
+                            plt.figure()
+                            # Plot the response data
+                            ax = plt.axes(projection='3d')
+                            ax.scatter3D(x_data_fit[0], x_data_fit[1], y_data_fit, c=y_data_fit, marker='o', label='Response data')
+                            # Plot the fitted function surface
+                            y_fit_3d = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
+                            ax.plot_trisurf(x_data_fit[0], x_data_fit[1], y_fit_3d, alpha=0.5, color='red', label='Fitted function')
+                            
+                            ax.set_title(product_function["template_string"])
+                            ax.set_xlabel(f_list[0])
+                            ax.set_ylabel(f_list[1])
+                            ax.legend()
+                            
+                        if save_visual == True:
+                                plt.savefig('{}/{}.pdf'.format(visual_dir, product_function["template_string"]))
+                        if visual == True: plt.show()
+                        
+                    # Save HDF5 data for all product functions.
+                    if save_visual:
+                        # Calculate fitted output for all data points
+                        y_fit = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
+                        
+                        with h5py.File('./output/analysis_{}/product_functions.h5'.format(analysis_dir_count), 'a') as f:
+                            # Create a group for the channel if it doesn't exist
+                            channel_grp = f.require_group(f'y{channel_id + 1}')
+                            # Create a group for the product function
+                            fcn_grp = channel_grp.create_group(product_function["template_string"])
+                            
+                            # Save each input as x1, x2, x3, etc.
+                            for i in range(arg_count):
+                                fcn_grp.create_dataset('x{}'.format(i+1), data=x_data_fit[i])
+                            
+                            # Save output and fitted output
+                            fcn_grp.create_dataset('y', data=y_data_fit)
+                            fcn_grp.create_dataset('y_fit', data=y_fit)
+                            
                 else:
                     # Handle constant bias at the zero point.
                     channel_bias = bias[0, channel_id].detach().numpy()
@@ -432,57 +491,6 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                     if verbose:
                         print("Constant " + channel_bias_str)
                         print()
-                        
-                # Plot 2D and 3D data with fitted function for visual inspection.
-                if len(arg_list) > 0 and (save_visual == True or visual == True):
-                    if arg_count == 1:
-                        plt.figure()
-                        plt.scatter(x_data_fit[0], y_data_fit, marker='.', label='Data')
-                        # Plot the fitted function
-                        y_fit_1d = None
-                        if product_function["function"] is not None and len(product_function["parameters"]) > 0:
-                            x_sorted_indices = np.argsort(x_data_fit[0])
-                            x_sorted = x_data_fit[0][x_sorted_indices]
-                            y_fit_1d = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
-                            y_fit_sorted = y_fit_1d[x_sorted_indices]
-                            plt.plot(x_sorted, y_fit_sorted, 'r-', linewidth=2, label='Fitted function')
-                        plt.title(product_function["template_string"])
-                        plt.xlabel(f_list[0])
-                        plt.legend()
-                        if save_visual == True:
-                            plt.savefig('./output/analysis_{}/{}.pdf'.format(analysis_dir_count, \
-                                        product_function["template_string"]))
-                            pltDict = {"x": x_data_fit[0].tolist(),
-                                   "y": y_data_fit.tolist()}
-                            if y_fit_1d is not None:
-                                pltDict["y_fit"] = y_fit_1d.tolist()
-                            mat4py.savemat('./output/analysis_{}/{}.mat'.format(analysis_dir_count, \
-                                           product_function["template_string"]), pltDict)
-                        if visual == True: plt.show()
-                    if arg_count == 2:
-                        plt.figure()
-                        ax = plt.axes(projection='3d')
-                        ax.scatter3D(x_data_fit[0], x_data_fit[1], y_data_fit, c=y_data_fit, marker='o', label='Data')
-                        # Plot the fitted function surface
-                        y_fit_2d = None
-                        if product_function["function"] is not None and len(product_function["parameters"]) > 0:
-                            y_fit_2d = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
-                            ax.plot_trisurf(x_data_fit[0], x_data_fit[1], y_fit_2d, alpha=0.5, color='red', label='Fitted function')
-                        ax.set_title(product_function["template_string"])
-                        ax.set_xlabel(f_list[0])
-                        ax.set_ylabel(f_list[1])
-                        ax.legend()
-                        if save_visual == True:
-                            plt.savefig('./output/analysis_{}/{}.pdf'.format(analysis_dir_count, \
-                                        product_function["template_string"]))
-                            pltDict = {"x": x_data_fit[0].tolist(),
-                                   "y": x_data_fit[1].tolist(),
-                                   "z": y_data_fit.tolist()}
-                            if y_fit_2d is not None:
-                                pltDict["z_fit"] = y_fit_2d.tolist()
-                            mat4py.savemat('./output/analysis_{}/{}.mat'.format(analysis_dir_count, \
-                                           product_function["template_string"]), pltDict)
-                        if visual == True: plt.show()
                     
                 # Check if the candidate product function improves the accuracy of the model.
                 if sig_index > 0:

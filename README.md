@@ -65,7 +65,7 @@ This will install all required dependencies including:
 * [NumPy](https://numpy.org/) - for numerical computations
 * [matplotlib](https://matplotlib.org/) - for plotting
 * [PyPrind](https://github.com/rasbt/pyprind) - for progress indicators
-* [mat4py](https://pypi.org/project/mat4py/) - for MATLAB data export
+* [h5py](https://www.h5py.org/) - for HDF5 data export
 * [joblib](https://joblib.readthedocs.io/) - for parallel processing
 * [psutil](https://github.com/giampaolo/psutil) - for system monitoring
 
