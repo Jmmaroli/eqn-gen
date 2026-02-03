@@ -535,21 +535,53 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
         # Print the completed equation for the current output channel.     
         if verbose: print("System equation")
         if verbose: print("============================================================")
-        # Print the function template for the current output channel.
-        y_str = "y" + str(channel_id+1) + "[k] = "
+        # Initialize strings for equations
+        y_str_template = "y" + str(channel_id+1) + "[k] = "
+        y_str_estimate = "y" + str(channel_id+1) + "[k] = "
+
+        # Build the equations term by term
         for idf, product_function in enumerate(channel_function):
-            y_str = y_str + product_function["template_string"]
+            template = product_function["template_string"]
+            estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
+
+            # Append to the main template equation
+            y_str_template += template
+            # Append to the main estimate equation
+            y_str_estimate += estimate
+
+            # Add " + " if not the last term
             if idf < len(channel_function) - 1:
-                y_str = y_str + " + "
-        print(y_str)
-        y_str = "y" + str(channel_id+1) + "[k] = "
-        for idf, product_function in enumerate(channel_function):
-            if product_function["estimate_string"] != None:
-                y_str = y_str + product_function["estimate_string"]
-                if idf < len(channel_function) - 1:
-                    y_str = y_str + " + "
-        print(y_str)
+                y_str_template += " + "
+                y_str_estimate += " + "
+
+        # Print template equation
+        print(y_str_template)
         print()
+
+        # Print template-to-estimate mapping
+        for product_function in channel_function:
+            template = product_function["template_string"]
+            estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
+            print(f"{template} = {estimate}")
+            
+        # Print estimate equation
+        print()
+        print(y_str_estimate)
+        print()
+
+        # Save to file if needed
+        if save_visual:
+            equation_file_path = './output/analysis_{}/system_equation.txt'.format(analysis_dir_count)
+            with open(equation_file_path, 'a') as f:
+                f.write(y_str_template + '\n')
+                f.write('\n')
+                for product_function in channel_function:
+                    template = product_function["template_string"]
+                    estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
+                    f.write(f"{template} = {estimate}\n")
+                f.write('\n')
+                f.write(y_str_estimate + '\n')
+                f.write('\n')
         
         model_function.append(channel_function)
                 
