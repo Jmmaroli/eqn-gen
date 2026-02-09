@@ -38,7 +38,7 @@ if __name__ == "__main__":
         "test_data": 0.2,           # test data proportion
         "seed": 1111,               # random seed
         "visual": False,            # plot training metrics
-        "save_visual": True,        # save training metrics plot
+        "save_data": True,          # save training metrics plot
     }
     
     analysis_parameters = {
@@ -51,14 +51,14 @@ if __name__ == "__main__":
         "seed": 1111,                       # analysis rng seed for reproducability
         "verbose": True,                    # print details of analysis
         "visual": False,                    # plot available 2D and 3D product function samples
-        "save_visual": True                 # save plots of available 2D and 3D product function samples
+        "save_data": True                   # save plots of available 2D and 3D product function samples
     }
     
     tuning_parameters = {
         "ga_population": 250,               # population of a GA generation
         "ga_generations": 100,              # generations to run GA
         "visual": False,                    # plot GA training metrics
-        "save_visual": True,                # save plot of GA training metrics
+        "save_data": True,                  # save plot of GA training metrics
         "seed": 1111                        # GA rng seed for reproducability
     }
     

@@ -17,11 +17,12 @@ import h5py
 import os
 
 from lib.evaluate_function import evaluate_function
+from lib.format_channel_function import format_channel_function
 
 # Format of function parameters.
 FORMAT = '%.3e'
 
-def analyze_model(analysis_parameters, model_dictionary, input_data, output_data, input_mask=1):
+def analyze_model(analysis_parameters, model_dictionary, input_data, output_data, input_mask=1, output_dir=None, subfolder_name=None):
     
     functions = analysis_parameters["functions"]
     sweep_initial = analysis_parameters["sweep_initial"]
@@ -33,7 +34,7 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
     np.random.seed(seed)
     verbose = analysis_parameters["verbose"]
     visual = analysis_parameters["visual"]
-    save_visual = analysis_parameters["save_visual"]
+    save_data = analysis_parameters["save_data"]
     
     # Check inputs for validity.
     if sweep_initial < 1:
@@ -67,13 +68,14 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
     sig_y_t = torch.tensor(sig_y, dtype=torch.float)
     
     # Get the current data output folder if saving data and plots.
-    if save_visual == True:
-        if not os.path.exists('./output'):
-            os.mkdir('./output')
-        analysis_dir_count = 1
-        while os.path.exists('./output/analysis_{}'.format(analysis_dir_count)):
-            analysis_dir_count = analysis_dir_count + 1
-        os.mkdir('./output/analysis_{}'.format(analysis_dir_count))
+    if save_data == True:
+        if output_dir is not None and subfolder_name is not None:
+            # Use the provided output directory and subfolder name
+            analysis_dir = os.path.join(output_dir, subfolder_name)
+            os.makedirs(analysis_dir, exist_ok=False)
+        else:
+            # Throw an exception if data is to be saved without specified directory
+            raise ValueError('output_dir and subfolder_name must be specified to save data.')
 
     # Generate every possible combination of impulses.
     if history < history_eff:
@@ -412,8 +414,8 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                                 print("")
                                 
                     # Plot 2D and 3D data with fitted function for visual inspection.
-                    if (save_visual or visual) and (arg_count == 1 or arg_count == 2):
-                        visual_dir = './output/analysis_{}/y{}_visuals'.format(analysis_dir_count, channel_id+1)
+                    if (save_data or visual) and (arg_count == 1 or arg_count == 2):
+                        visual_dir = os.path.join(analysis_dir, 'y{}_visuals'.format(channel_id+1))
                         os.makedirs(visual_dir, exist_ok=True)
                         
                         if arg_count == 1:
@@ -446,16 +448,16 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
                             ax.set_ylabel(f_list[1])
                             ax.legend()
                             
-                        if save_visual == True:
+                        if save_data == True:
                                 plt.savefig('{}/{}.pdf'.format(visual_dir, product_function["template_string"]))
                         if visual == True: plt.show()
                         
                     # Save HDF5 data for all product functions.
-                    if save_visual:
+                    if save_data:
                         # Calculate fitted output for all data points
                         y_fit = product_function["function"]["fcn"](x_data_fit, *product_function["parameters"])
                         
-                        with h5py.File('./output/analysis_{}/product_functions.h5'.format(analysis_dir_count), 'a') as f:
+                        with h5py.File(os.path.join(analysis_dir, 'product_functions.h5'), 'a') as f:
                             # Create a group for the channel if it doesn't exist
                             channel_grp = f.require_group(f'y{channel_id + 1}')
                             # Create a group for the product function
@@ -535,53 +537,16 @@ def analyze_model(analysis_parameters, model_dictionary, input_data, output_data
         # Print the completed equation for the current output channel.     
         if verbose: print("System equation")
         if verbose: print("============================================================")
-        # Initialize strings for equations
-        y_str_template = "y" + str(channel_id+1) + "[k] = "
-        y_str_estimate = "y" + str(channel_id+1) + "[k] = "
-
-        # Build the equations term by term
-        for idf, product_function in enumerate(channel_function):
-            template = product_function["template_string"]
-            estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
-
-            # Append to the main template equation
-            y_str_template += template
-            # Append to the main estimate equation
-            y_str_estimate += estimate
-
-            # Add " + " if not the last term
-            if idf < len(channel_function) - 1:
-                y_str_template += " + "
-                y_str_estimate += " + "
-
-        # Print template equation
-        print(y_str_template)
-        print()
-
-        # Print template-to-estimate mapping
-        for product_function in channel_function:
-            template = product_function["template_string"]
-            estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
-            print(f"{template} = {estimate}")
-            
-        # Print estimate equation
-        print()
-        print(y_str_estimate)
-        print()
+        # Format channel function strings and print
+        y_str_template, y_str_estimate, y_str_mappings = format_channel_function(channel_function, channel_id+1)
+        channel_str_detailed = y_str_template + '\n\n' + y_str_mappings + '\n\n' + y_str_estimate + '\n'
+        print(channel_str_detailed)
 
         # Save to file if needed
-        if save_visual:
-            equation_file_path = './output/analysis_{}/system_equation.txt'.format(analysis_dir_count)
+        if save_data:
+            equation_file_path = os.path.join(analysis_dir, 'system_equation.txt')
             with open(equation_file_path, 'a') as f:
-                f.write(y_str_template + '\n')
-                f.write('\n')
-                for product_function in channel_function:
-                    template = product_function["template_string"]
-                    estimate = product_function["estimate_string"] if product_function["estimate_string"] is not None else "0"
-                    f.write(f"{template} = {estimate}\n")
-                f.write('\n')
-                f.write(y_str_estimate + '\n')
-                f.write('\n')
+                f.write(channel_str_detailed)
         
         model_function.append(channel_function)
                 

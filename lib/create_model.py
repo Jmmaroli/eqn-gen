@@ -46,7 +46,7 @@ FORMAT = '%.3e'
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-def create_model(model_parameters, inputData, outputData, inputMask=1):
+def create_model(model_parameters, inputData, outputData, inputMask=1, output_dir=None, subfolder_name=None):
     
     epochs = model_parameters["epochs"]                       # upper epoch limit
     cuda = model_parameters["cuda"]                           # use the GPU
@@ -65,7 +65,7 @@ def create_model(model_parameters, inputData, outputData, inputMask=1):
     test_data = model_parameters["test_data"]                 # test data proportion
     seed = model_parameters["seed"]                           # random seed
     visual = model_parameters["visual"]                       # plot training metrics
-    save_visual = model_parameters["save_visual"]             # save training metric plot
+    save_data = model_parameters["save_data"]             # save training metric plot
 
     torch.manual_seed(seed)
     
@@ -78,13 +78,14 @@ def create_model(model_parameters, inputData, outputData, inputMask=1):
         torch.backends.cudnn.benchmark = False
     
     # Get the current data output folder if saving data and plots.
-    if save_visual:
-        if not os.path.exists('./output'):
-            os.mkdir('./output')
-        model_dir_count = 1
-        while os.path.exists('./output/model_{}'.format(model_dir_count)):
-            model_dir_count = model_dir_count + 1
-        os.mkdir('./output/model_{}'.format(model_dir_count))
+    if save_data:
+        if output_dir is not None and subfolder_name is not None:
+            # Use the provided output directory and subfolder name
+            model_dir = os.path.join(output_dir, subfolder_name)
+            os.makedirs(model_dir, exist_ok=False)
+        else:
+            # Throw an exception if data is to be saved without specified directory
+            raise ValueError('output_dir and subfolder_name must be specified to save data.')
 
     # Create the TCN network.
     print("Initializing TCN model...")
@@ -219,7 +220,7 @@ def create_model(model_parameters, inputData, outputData, inputMask=1):
     print()
             
     # Plot training and test loss.
-    if save_visual == True or visual == True:
+    if save_data == True or visual == True:
         plt.figure()
         ax = plt.subplot(1,1,1)
         plt.plot(trainLossHistory)
@@ -229,7 +230,7 @@ def create_model(model_parameters, inputData, outputData, inputMask=1):
         plt.xlabel('Epoch')
         plt.ylabel('MSE Loss')
         ax.set_yscale("log", nonpositive='clip')
-        if save_visual == True: plt.savefig('./output/model_{}/loss.pdf'.format(model_dir_count))
+        if save_data == True: plt.savefig(os.path.join(model_dir, 'loss.pdf'))
         if visual == True: plt.show()
     print("Min train: epoch " + str(np.argmin(trainLossHistory)+1))
     print("Min test: epoch " + str(np.argmin(testLossHistory)+1))

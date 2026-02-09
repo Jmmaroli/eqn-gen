@@ -9,27 +9,26 @@ import pyprind
 import matplotlib.pyplot as plt
 
 from lib.evaluate_function import evaluate_function
+from lib.format_channel_function import format_channel_function
 
-def tune_model(tuning_parameters, model_function, input_data, output_data):
+def tune_model(tuning_parameters, model_function, input_data, output_data, output_dir=None, subfolder_name=None):
     
     population_size = tuning_parameters["ga_population"]
     generation_count = tuning_parameters["ga_generations"]
     visual = tuning_parameters["visual"]
-    save_visual = tuning_parameters["save_visual"]
+    save_data = tuning_parameters["save_data"]
     seed = tuning_parameters["seed"]
     
     np.random.seed(seed)
     
-    if save_visual == True:
-        # Setup the most recent analysis directory to store GA tuning metrics.
-        if not os.path.exists('./output'):
-            os.mkdir('./output')
-        analysis_dir_count = 1
-        while os.path.exists('./output/analysis_{}'.format(analysis_dir_count)):
-            analysis_dir_count = analysis_dir_count + 1
-        analysis_dir_count = analysis_dir_count - 1
-        if not os.path.exists('./output/analysis_{}'.format(analysis_dir_count)):
-            os.mkdir('./output/analysis_{}'.format(analysis_dir_count))
+    if save_data == True:
+        if output_dir is not None and subfolder_name is not None:
+            # Use the provided output directory and subfolder name
+            ga_dir = os.path.join(output_dir, subfolder_name)
+            os.makedirs(ga_dir, exist_ok=False)
+        else:
+            # Throw an exception if data is to be saved without specified directory
+            raise ValueError('output_dir and subfolder_name must be specified to save data.')
     
     # Tune each channel individually.
     model_function_tuned = copy.deepcopy(model_function)
@@ -120,14 +119,25 @@ def tune_model(tuning_parameters, model_function, input_data, output_data):
                         *product_function["parameters"])
         print()
         
+        # Save tuned channel function to file if needed
+        if save_data:
+            # Format channel function strings
+            y_str_template, y_str_estimate, y_str_mappings = format_channel_function(channel_function, channel_id+1)
+            channel_str_detailed = y_str_template + '\n\n' + y_str_mappings + '\n\n' + y_str_estimate + '\n\n'
+            
+            # Save to tuned_equation.txt file
+            equation_file_path = os.path.join(ga_dir, 'tuned_equation.txt')
+            with open(equation_file_path, 'a') as f:
+                f.write(channel_str_detailed)
+        
         # Plot GA tuning metrics.
-        if save_visual == True or visual == True:
+        if save_data == True or visual == True:
             plt.figure()
             plt.plot(top_heuristic)
             plt.title('Top MAE vs Generation')
             plt.xlabel('Generation')
             plt.ylabel('MAE')
-            if save_visual == True: plt.savefig('./output/analysis_{}/ga_mae.pdf'.format(analysis_dir_count))
+            if save_data == True: plt.savefig(os.path.join(ga_dir, 'ga_mae.pdf'))
             if visual == True: plt.show()
         
     return model_function_tuned
